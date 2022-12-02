@@ -62,17 +62,17 @@ func expectedPointsForRound(inputLine string) int {
 	fmt.Printf("evaluating %s\n", inputLine)
 	switch inputLine {
 	case "A X": // rock lose
-		return 2 // paper + lose
+		return 3 // paper + lose
 	case "A Y": // rock draw
 		return 4
 	case "A Z": // rock win
-		return 7
+		return 8
 	case "B X": // paper lose
 		return 1
 	case "B Y": // paper draw
 		return 5
 	case "B Z": // paper win
-		return 8
+		return 9
 	case "C X": // scissor lose
 		return 2
 	case "C Y": // scissor draw
