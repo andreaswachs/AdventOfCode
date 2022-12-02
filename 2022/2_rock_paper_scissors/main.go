@@ -42,7 +42,6 @@ func main() {
 		line := fileScanner.Text()
 		pointsPart1 += pointsForRound(line)
 		bb := expectedPointsForRound(line)
-		fmt.Printf("result: %d\n", bb)
 		pointsPart2 += bb
 	}
 
@@ -59,7 +58,6 @@ func pointsForRound(inputLine string) int {
 
 // This function returns the results foreach line for part two
 func expectedPointsForRound(inputLine string) int {
-	fmt.Printf("evaluating %s\n", inputLine)
 	switch inputLine {
 	case "A X": // rock lose
 		return 3 // paper + lose
