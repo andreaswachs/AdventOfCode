@@ -14,7 +14,7 @@ type Range struct {
 }
 
 // Evalutates whether or not the range `r` contains another range `otherRange`.
-// // Keep in mind that even if one Range does not contain the other, the other
+// Keep in mind that even if one Range does not contain the other, the other
 // might contain the first one, so you might need to check "in both directions".
 func (r *Range) contains(otherRange Range) bool {
 	return otherRange.From >= r.From && otherRange.To <= r.To
@@ -64,7 +64,6 @@ func solve1(line string) int {
 	return 0
 }
 
-// Solve for part 2
 func solve2(line string) int {
 	// The line should be of shape "<<range>>,<<range>>"
 	ranges := strings.Split(line, ",")
