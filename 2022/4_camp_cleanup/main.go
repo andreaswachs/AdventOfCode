@@ -22,8 +22,14 @@ func (r *Range) contains(otherRange Range) bool {
 
 // Computes whether there is any overlap between two ranges
 func (r *Range) overlaps(otherRange Range) bool {
+
+	// You should be able to compute this in constant time instead by
+	// comparing From/To's, but I'm speedrunning this and this is
+	// way faster for me to express. Inputs are also range at a maximum of 1-100ish,
+	// so the input size is rather small
 	for i := r.From; i <= r.To; i++ {
 		if i >= otherRange.From && i <= otherRange.To {
+			// Returns early, if there are overlap
 			return true
 		}
 	}
