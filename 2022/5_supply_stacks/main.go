@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io"
-	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -28,24 +26,16 @@ func NewStack[T any](craneType CraneType) Stack[T] {
 	}
 }
 
-func (s *Stack[T]) Print() {
-	log.Printf("Stack: %v", s.items)
-}
-
 func (s *Stack[T]) Push(item T) {
-	log.Printf("Pushing %v onto the stack", item)
 	s.items = append(s.items, item)
-	log.Printf("Stack after push: %v", s.items)
 }
 
 func (s *Stack[T]) PushMany(items []T) {
-	log.Printf("Log before PushMany(%v): %v", items, s.items)
 
 	for i := len(items)-1; i >= 0; i-- {
 		s.items = append(s.items, items[i])
 	}
 
-	log.Printf("Log after PushMany(%v): %v", items, s.items)
 }
 
 func (s *Stack[T]) Grab() (T, error) {
@@ -121,13 +111,13 @@ func parseInstruction(input string) (int, int, int) {
 	return quantity, from, to
 }
 
+// Solve solves the challenge based on crane type. The part parameter is just for printing.
 func solve(readFile []byte, craneType CraneType, part int) {
 	// Set up the stacks
 	stacksAndInstructions := strings.Split(string(readFile), "\n\n")
 	stacksHeader := strings.Split(stacksAndInstructions[0], "\n")
 
 	stackIndices := getStacks(stacksHeader)
-	log.Printf("Stack indicies: %v", stackIndices)
 
 	stacks := make(map[int]Stack[string])
 
@@ -150,18 +140,8 @@ func solve(readFile []byte, craneType CraneType, part int) {
 		}
 	}
 
-
-	// Debug logging to inspect stack state
-	log.Println("Inspecting stack state after creation")
-	for _, v := range stackIndices {
-		stack := stacks[v]
-		stack.Print()
-	}
-
-
 	// Execute the instructions
 	instructions := strings.Split(stacksAndInstructions[1], "\n")
-
 	for _, instruction := range instructions {
 		quantity, from, to := parseInstruction(instruction)
 
@@ -173,14 +153,8 @@ func solve(readFile []byte, craneType CraneType, part int) {
 		stacks[to] = stackTo
 
 	}
-	// Debug logging to inspect stack state
-	log.Println("Inspecting stack state after instructions")
-	for _, v := range stackIndices {
-		stack := stacks[v]
-		stack.Print()
-	}
 
-	// Collect the result for part1
+	// Collect the result
 	fmt.Printf("Result part %d: ", part)
 	for _, v := range stackIndices {
 		stack := stacks[v]
@@ -192,10 +166,6 @@ func solve(readFile []byte, craneType CraneType, part int) {
 
 
 func main() {
-	if os.Getenv("LOGS") != "1" {
-		log.SetOutput(io.Discard)
-	}
-
 	readFile, err := os.ReadFile(os.Args[1])
 	if err != nil {
 		panic(err)
