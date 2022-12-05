@@ -7,8 +7,10 @@ import (
 	"strings"
 )
 
+// Defines a new type to select the type of crane that is used.
+// This controls behaviour for whether or not the crane is able to
+// pick up multiple boxes at once
 type CraneType uint8
-
 const (
 	CrateMover9000 CraneType = iota
 	CrateMover9001
@@ -20,6 +22,8 @@ type Stack[T any] struct {
 	Version CraneType
 }
 
+// Creates a new stack with a given crane type. The crane type is only important for the
+// GrabMany function.
 func NewStack[T any](craneType CraneType) Stack[T] {
 	return Stack[T]{
 		Version: craneType,
@@ -68,6 +72,14 @@ func (s *Stack[T]) GrabMany(count int) []T {
 	return buffer
 }
 
+// getStacks gets the stacks from the input line below the stacks:
+// RNLFDJMCT
+//     [D]
+// [N] [C]
+// [Z] [M] [P]
+//  1   2   3   <----- these lines
+//
+//  and returns them as a list of integers
 func getStacks(input []string) []int {
 	stacksNumbersLine := input[len(input)-1]
 	numberOfStacks := strings.Split(strings.TrimSpace(strings.Replace(stacksNumbersLine, "   ", " ", -1)), " ")
@@ -86,10 +98,13 @@ func getStacks(input []string) []int {
 	return result
 }
 
+// Computes the indicies from a stack number, which corresponds to the location in the crates for a given stack
 func indexWithStack(stack int) int {
 	return 1 + (4 * (stack - 1))
 }
 
+// Extracts information about the movement instructions from the instructions:
+// move N from A to B, and returns (N, A, B)
 func parseInstruction(input string) (int, int, int) {
 	tokens := strings.Split(input, " ")
 
