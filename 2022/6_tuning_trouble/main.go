@@ -41,7 +41,7 @@ func checkUniqueness(r rune) bool {
 // For part 1, we need to look for unique sequences of runes with a length of 4, and
 // for part 2, we need to look for unique sequences of runes with a length of 14,
 // so I've deduceted 1 from the result due to my method of solving this in solve()
-func getPacketOffset(pt packetType) int {
+func getSequenceOffset(pt packetType) int {
 	switch pt {
 	case startOfPacket:
 		return 3
@@ -59,17 +59,17 @@ func getPacketOffset(pt packetType) int {
 // If it finds a sequence of 4/14 letters that are unique in that sequence, it returns the index of the
 // character after this sequence, since that sequence either signalled the start of the packet or message.
 func solve(input string, pt packetType) (int, error) {
-	bound := len(input) - 4 // should this be 4?
-	additionalPackets := getPacketOffset(pt)
+	bound := len(input) - 4
+	sequenceOffset := getSequenceOffset(pt)
 
 	// Go thorough all the characeters but the last 4 ones
 	for i := 0; i <= bound; i++ {
 		resetCheckBuffer()
 		// Go through runes i, .. i+4
-		for j := i; j <= i+additionalPackets; j++ {
+		for j := i; j <= i+sequenceOffset; j++ {
 			r := rune(input[j]) // to inspect current rune for debugging
 			if checkUniqueness(r) {
-				if j == i+additionalPackets {
+				if j == i+sequenceOffset {
 					return j + 1, nil
 				}
 			} else {
