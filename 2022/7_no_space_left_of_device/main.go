@@ -9,10 +9,17 @@ import (
 )
 
 var (
-	regexForCD          = regexp.MustCompile(`^\$ cd (?P<dir>.+)$`)
-	regexForLS          = regexp.MustCompile(`^\$ ls`)
-	regexForDirListing  = regexp.MustCompile(`^dir (?P<dir>.*)$`)
-	regexForFileListing = regexp.MustCompile(`^(?P<size>\d+) (?P<name>\S+)$`)
+	regexForCD                 = regexp.MustCompile(`^\$ cd (?P<dir>.+)$`)
+	regexForLS                 = regexp.MustCompile(`^\$ ls`)
+	regexForDirListing         = regexp.MustCompile(`^dir (?P<dir>.*)$`)
+	regexForFileListing        = regexp.MustCompile(`^(?P<size>\d+) (?P<name>\S+)$`)
+	part1AnswerBuffer   uint64 = 0
+	directorySizes      []uint64
+)
+
+const (
+	diskSpace = 70000000
+	needSpace = 30000000
 )
 
 type lineType uint8
@@ -44,25 +51,30 @@ func (d *Directory) AddFile(file *File) {
 	d.Files[file.Name] = file
 }
 
+// Size returns the size of the directory and all subdirectories summed together
 func (d *Directory) Size() uint64 {
-	var subDirsSize uint64 = 0
-
-	for _, subDir := range d.Subdirs {
-		subDirsSize += subDir.Size()
-	}
-
-	var thisDirSize uint64 = 0
+	var directorySize uint64 = 0
 	for _, file := range d.Files {
-		thisDirSize += file.Size
+		directorySize += file.Size
 	}
 
-	if thisDirSize > 100000 {
-		return 0 + subDirsSize
+	for _, subdir := range d.Subdirs {
+		directorySize += subdir.Size()
 	}
 
-	return thisDirSize + subDirsSize
+	// This is for part 1
+	if directorySize <= 100000 {
+		part1AnswerBuffer += directorySize
+	}
+
+	// This is for part 2
+	directorySizes = append(directorySizes, directorySize)
+
+	return directorySize
 }
 
+// NewDir creates a new directory with the given name and parent directory.
+// It also initializes the subdirectories and files maps.
 func NewDir(name string, parentDir *Directory) *Directory {
 	subdirs := make(map[string]*Directory)
 	files := make(map[string]*File)
@@ -70,6 +82,7 @@ func NewDir(name string, parentDir *Directory) *Directory {
 	return &Directory{Name: name, Files: files, Subdirs: subdirs, ParentDir: parentDir}
 }
 
+// NewFile creates a new file with the given name and size.
 func NewFile(name string, size uint64) *File {
 	return &File{Name: name, Size: size}
 }
@@ -147,12 +160,16 @@ func main() {
 		panic(err)
 	}
 
+	// We manually create the root directory as we assume that the input will always start with `cd /`
 	rootDirectory := NewDir("/", nil)
 	currentDir := rootDirectory
 
+	// We split the input into lines for easier processing
 	lines := strings.Split(string(readFile), "\n")
-	lines = lines[2:] // We ignore the first two lines of the input which is just `cd /` and `ls`.
+	// We ignore the first two lines as they are the instructions to cd into the root directory and `ls`
+	lines = lines[2:]
 
+	// Go throguh all the the lines in the input and build the directory structure
 	for _, line := range lines {
 		lt, payload := getLineTypeAndPayload(line, currentDir)
 		switch lt {
@@ -174,7 +191,25 @@ func main() {
 	}
 
 	// Solve for part 1
+	spaceUsed := rootDirectory.Size()
+	fmt.Printf("Result part 1: %d\n", part1AnswerBuffer)
 
-	fmt.Printf("Result part 1: %d\n", rootDirectory.Size())
+	// Solve for part 2
+	// Calculate the unused amount of space
+	unusedSpace := diskSpace - spaceUsed
+	// Calculate the amount of space we need to free
+	needToFree := int64(needSpace - unusedSpace)
 
+	// Find out the least amount of space we need to free in order to
+	// free the necessary amount of space
+	var spaceToFree int64
+	for _, size := range directorySizes {
+		directorySize := int64(size)
+		if needToFree-directorySize < 0 {
+			if spaceToFree == 0 || spaceToFree > directorySize {
+				spaceToFree = directorySize
+			}
+		}
+	}
+	fmt.Printf("Result part 2: %d\n", spaceToFree)
 }
