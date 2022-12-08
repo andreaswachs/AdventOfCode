@@ -1,5 +1,9 @@
 package main
 
+/*
+	This solution is very ugly :D
+*/
+
 import (
 	"log"
 	"os"
