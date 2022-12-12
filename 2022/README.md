@@ -7,3 +7,4 @@ I have decided to attempt AoC for 2022 in pure Golang, as a warm up to my bachel
 ## Backlog
 
 - [ ] Second part of [day 9](https://adventofcode.com/2022/day/9). The rope knots doesn't follow exactly how the examples does and the result is around 1/5 off. This is the only known problem
+- [ ] All of [day 11](https://adventofcode.com/2022/day/11).
