@@ -2,90 +2,61 @@
 {
     private static string[] digits = 
     {
-        "one",
-        "two",
-        "three",
-        "four",
-        "five",
-        "six",
-        "seven",
-        "eight",
-        "nine"
+        "one", "two", "three",
+        "four", "five", "six",
+        "seven", "eight", "nine"
     };
 
+    private static IEnumerable<string> GetForwardEnumerableOf(string s) {
+        int right = s.Length > 5 ? 5 : s.Length;
+        for(int left = 0; left < s.Length; left++) {
+            yield return s.Substring(left, right - left);
+
+            if (right < s.Length) {
+                right++;
+            }
+        }
+    }
+
+    private static IEnumerable<string> GetBackwardEnumerableOf(string s) {
+        for(int left = s.Length - 1, right = s.Length; right >= 1;) {
+            yield return s.Substring(left, right - left);
+            if (left == 0) {
+                right--;
+            } 
+            if (left > 0) {
+                left--;
+            }
+            if (right - left > 5) {
+                right--;
+            }
+        }
+    }
     private static int stringDigitToInt(string s)
-    {
-        switch (s)
-        {
-            case "one":
-                return 1;
-            case "two":
-                return 2;
-            case "three":
-                return 3;
-            case "four":
-                return 4;
-            case "five":
-                return 5;
-            case "six":
-                return 6;
-            case "seven":
-                return 7;
-            case "eight":
-                return 8;
-            case "nine":
-                return 9;
+        => Array.IndexOf(digits, s) + 1;
 
-            default:
-                return -100000;
-        }
-    }
-
-    private static int getA(string s)
+    private static int get(IEnumerable<string> e)
     {
-        int limit = s.Length;
-        for(int i = 0; i < limit; i++)
+        foreach(string window in e)
         {
-            if (Char.IsDigit(s[i]))
+            if (Char.IsDigit(window[0]))
             {
-                return (int) s[i] - '0';
+                return (int) window[0] - '0';
             }
 
-            var sub = s.Substring(i);
             foreach(var digit in digits)
             {
-                if (sub.StartsWith(digit))
+                if (window.StartsWith(digit))
                 {
                     return stringDigitToInt(digit);
                 }
             }
+
         }
 
-        throw new Exception($"I could not compute A for {s}");
+        throw new Exception("I should not have reached this place");
     }
-        
-    private static int getB(string s)
-    {
-        int limit = s.Length - 1;
-        for(int i = limit; i >= 0; i--)
-        {
-            if (Char.IsDigit(s[i]))
-            {
-                return (int) s[i] - '0';
-            }
 
-            var sub = s.Substring(i);
-            foreach(var digit in digits)
-            {
-                if (sub.StartsWith(digit))
-                {
-                    return stringDigitToInt(digit);
-                }
-            }
-        }
-
-        throw new Exception($"I could not compute B for {s}");
-    }
     private static void Main(string[] args)
     {
         if (args.Length != 1)
@@ -101,8 +72,13 @@
             string? s = string.Empty;
             while ((s = sr.ReadLine()) != null)
             {
+                var forward = GetForwardEnumerableOf(s);
+                var backward = GetBackwardEnumerableOf(s);
 
-                sum += getA(s) * 10 + getB(s);
+                var a = get(forward) * 10;
+                var b = get(backward);
+
+                sum += a + b;
             }
 
             Console.WriteLine($"{sum}");
