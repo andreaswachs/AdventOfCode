@@ -28,14 +28,35 @@ Func<string, bool> drawPossible = s => {
     return amount <= maxAmounts[idx];
 };
 
-Func<string, bool> gamePossible = s => {
-    return s
+Func<string, bool> gamePossible = s => 
+        s
         .Substring(s.IndexOf(":") + 1)
         .Split(",;".ToCharArray())
         .Select(s => s.Trim())
         .Where(s => s.Length > 4)
         .All(drawPossible);
+
+
+Func<string, (int, int)> toColourAmount = s => {
+    var draw = s.Split(" ");
+    var idx = toColourIdx(draw[1]);
+    var amount = int.Parse(draw[0]);
+    return (amount, idx);
 };
+
+Func<string, int[]> minimumPossibleCubeSet = s =>
+    s.Substring(s.IndexOf(":") + 1)
+    .Split(",;".ToCharArray())
+    .Where(s => s.Length > 4)
+    .Select(s => s.Trim())
+    .Select(toColourAmount)
+    .Aggregate(new int[3] {0, 0, 0}, (acc, x) => {
+        (int amount, int idx) = x;
+        if (acc[idx] < amount) { 
+            acc[idx] = amount; 
+        }
+        return acc;
+    });
 
 Func<string, int> gameId = s =>
      int.Parse(s.Split(":")[0].Split(" ")[1]);
@@ -48,12 +69,20 @@ if (args.Length != 1) {
 using(StreamReader sr = File.OpenText(args[0])) {   
     string? input = String.Empty;
 
-    var res = sr.ReadToEnd()
-        .Split("\n")
-        .Where(s => s.Length > 0)
+    var data = sr.ReadToEnd().Split('\n').Where(s => s.Length > 0);
+
+    var res = data
         .Where(gamePossible)
         .Select(gameId)
         .Sum();
 
     Console.WriteLine($"Part 1: {res}");
+
+    var part2 = data
+        .Select(minimumPossibleCubeSet)
+        .Select(s => s.Aggregate(1, (acc, x) => acc * x))
+        .Sum();
+
+    Console.WriteLine($"Part 2: {part2}");
+
 }
