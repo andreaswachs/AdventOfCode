@@ -1,10 +1,7 @@
 ﻿const int RED = 0;
 const int GREEN = 1;
 const int BLUE = 2;
-int[] sums = new int[3];
 int [] maxAmounts = new int[3] {12, 13, 14};
-
-Action<int[]> resetArray = a => Array.Fill(a, 0);
 
 Func<string, int> toColourIdx = s => {
     switch (s) {
@@ -29,12 +26,12 @@ Func<string, bool> drawPossible = s => {
 };
 
 Func<string, bool> gamePossible = s => 
-        s
-        .Substring(s.IndexOf(":") + 1)
-        .Split(",;".ToCharArray())
-        .Select(s => s.Trim())
-        .Where(s => s.Length > 4)
-        .All(drawPossible);
+    s
+    .Substring(s.IndexOf(":") + 1)
+    .Split(",;".ToCharArray())
+    .Select(s => s.Trim())
+    .Where(s => s.Length > 4)
+    .All(drawPossible);
 
 
 Func<string, (int, int)> toColourAmount = s => {
@@ -51,6 +48,8 @@ Func<string, int[]> minimumPossibleCubeSet = s =>
     .Select(s => s.Trim())
     .Select(toColourAmount)
     .Aggregate(new int[3] {0, 0, 0}, (acc, x) => {
+        // Count the minimum number of cubes of a given colour
+        // for this to be a possible play
         (int amount, int idx) = x;
         if (acc[idx] < amount) { 
             acc[idx] = amount; 
@@ -69,14 +68,17 @@ if (args.Length != 1) {
 using(StreamReader sr = File.OpenText(args[0])) {   
     string? input = String.Empty;
 
-    var data = sr.ReadToEnd().Split('\n').Where(s => s.Length > 0);
+    var data = sr
+        .ReadToEnd()
+        .Split('\n')
+        .Where(s => s.Length > 0);
 
-    var res = data
+    var part1 = data
         .Where(gamePossible)
         .Select(gameId)
         .Sum();
 
-    Console.WriteLine($"Part 1: {res}");
+    Console.WriteLine($"Part 1: {part1}");
 
     var part2 = data
         .Select(minimumPossibleCubeSet)
@@ -84,5 +86,4 @@ using(StreamReader sr = File.OpenText(args[0])) {
         .Sum();
 
     Console.WriteLine($"Part 2: {part2}");
-
 }
