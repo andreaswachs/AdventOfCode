@@ -1,16 +1,12 @@
 ﻿internal class Utils
 {
     public static Func<(int, int), bool> WithinBounds(int maxx, int maxy)
-    {
-        Func<(int, int), bool> pred = pos => {
+        => new Func<(int, int), bool>((pos) => {
             return pos.Item1 >= 0 
                 && pos.Item1 < maxx 
                 && pos.Item2 >= 0 
                 && pos.Item2 <= maxy;
-        };
-
-        return pred;
-    }
+        });
 }
 
 internal class PartsNumber
@@ -255,7 +251,7 @@ internal class Program
 
     private static void Main(string[] args)
     {
-        if (args.Length != 2) {
+        if (args.Length != 1) {
             Console.WriteLine("Usage: dotnet run <input_file>");
             System.Environment.Exit(1);
         }
@@ -264,5 +260,4 @@ internal class Program
         Part1(input);
         Part2(input);
     }
-
 }
