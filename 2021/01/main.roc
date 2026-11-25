@@ -19,21 +19,20 @@ main! = |args| {
 				(0, I64.highest),
 				|(counter, prev), next| {
 					new_counter = if (next > prev) counter + 1 else counter
-
 					(new_counter, next)
 				},
 			)
 	}
 
 	ans1 = count_increasing(input)
-	Stdout.line!("[debug] ans1 = ${Str.inspect(ans1.0)}")?
+	Stdout.line!("[DEBUG] ans1 = ${Str.inspect(ans1.0)}")?
 
 	ans2_input = input.map_with_index(|_, i| input.sublist({ start: i, len: 3 }))
 		.drop_last(2)
 		.map(|l| l.fold(0, I64.plus))
 
 	ans2 = count_increasing(ans2_input)
-	Stdout.line!("[debug] ans2 = ${Str.inspect(ans2.0)}")?
+	Stdout.line!("[DEBUG] ans2 = ${Str.inspect(ans2.0)}")?
 
 	Ok({})
 }
